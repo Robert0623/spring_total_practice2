@@ -3,12 +3,14 @@ package com.myportfolio.web.domain;
 //1. DB를 보고 private으로 iv를 작성.
 //2. getter&setter, toString을 만든다.
 
+import java.util.Date;
+
 public class User {
     private String id;
     private String pwd;
     private String name;
     private String email;
-    private String birth;
+    private Date birth;
     private String sns;
 
     public String getId() {
@@ -43,11 +45,11 @@ public class User {
         this.email = email;
     }
 
-    public String getBirth() {
+    public Date getBirth() {
         return birth;
     }
 
-    public void setBirth(String birth) {
+    public void setBirth(Date birth) {
         this.birth = birth;
     }
 
