@@ -15,18 +15,31 @@
 //	링크는 '/login/login', 있으면 '/login/logout'
 //	문자는 'Login', 있으면 ID=아이디가 보이게 한다.
 
-### 회원정보
+### 회원
 //[User.java]
 //1. DB를 보고 private으로 iv를 작성.
-//2. getter&setter, toString을 만든다.
+//2. birth나 reg_date같이 날짜로 받는 것은 Date타입으로.
+//3. 기본생성자, 생성자, getter&setter, equals&hashCode, toString을 만든다.
+(equals에 reg_date를 빼고, id만 not null 체크)
 
-### 회원가입 및 회원정보
+//[UserDao.java]
+//1차로 JDBC로 작성
+
+### 회원가입 및 회원정보 출력
 //[RegisterController.java]
 //1. GET, POST를 처리할 메서드를 각각 만든다.
 //2. POST를 처리할 메서드는 User를 받아서 유효성 검사를 한다.
 //  	이 때 메세지를 보내는데 URLEncoder를 사용한다.
 //  	유효성검사를 통과하지 못하면 회원가입화면으로 다시 가게 하고,
 //  	유효성검사를 통과하면 회원정보를 보여주도록 한다.
+//3. 검증할 객체의 바로뒤에 BindingResult를 붙인다.
+//4. @InitBinder를 붙여서 WebDataBinder를 매개변수로 갖는 메서드를 만들어서 타입변환을 위해 CustomEditor를 등록한다.
+//5. 컨트롤러에서 isValid메서드를 사용한 유효성체크 대신,
+//	 UserValidator 클래스를 작성해서 자동으로 등록한다.(@Initbinder, @Valid) (수동 등록도 가능)
+//6. error가 있으면 registerForm으로 가게 한다.
+//---아래는 MyBatis로 수정 예정---
+//7. JDBC의 경우 UserDao를 주입받고 
+//8. 검증을 통과하면 insert. insert가 성공하면 회원정보가 보이게 하고, 통과하지 못하면 다시 회원가입으로 가게 한다.
 
 //[registerForm.jsp]
 //form태그에 action, method를 작성하고, onsubmit에 Js로 유효성 검사를 한다.
@@ -38,9 +51,16 @@
 //	2) 에러 메세지 출력과 해당 input태그를 선택하는 setMessage함수 작성
 //		(font-awesome와 i태그를 사용해서 메세지를 출력하게 해놓음.)
 //		(` `안의 ${ }는 HTML의 템플릿 리터럴이므로 EL로 다시 감싸줘야한다.)
+//4. form:form태그를 사용해서 Validator의 에러메세지를 출력한다.
 
 //[registerInfo.jsp]
 //Model로 user를 받으므로 user를 사용해서 값을 출력한다.
+
+### 유효성검사
+//[UserValidator.java]
+//Validator를 구현해서 작성한다.
+//Controller에서 로컬 Validator로 등록한다.
+//error_message.properties에 에러 메세지를 작성한다.
 
 ### 로그인
 //[LoginController.java]

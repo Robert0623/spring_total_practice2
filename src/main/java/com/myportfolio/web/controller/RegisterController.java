@@ -1,6 +1,8 @@
 package com.myportfolio.web.controller;
 
+import com.myportfolio.web.dao.UserDao;
 import com.myportfolio.web.domain.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +33,11 @@ import java.util.Date;
 @Controller
 @RequestMapping("/register")
 public class RegisterController {
+    @Autowired
+    UserDao userDao;
+
+    final int FAIL = 0;
+
     //@InitBinder로 CustomEditor로 Date타입 패턴을 등록 - 타입 변환
     @InitBinder
     public void toDate(WebDataBinder binder) {
@@ -64,7 +71,13 @@ public class RegisterController {
 //            m.addAttribute("msg", msg);
 //            return "redirect:/register/add";
 //        }
-        return "registerInfo";
+        int rowCnt = userDao.insertUser(user);
+
+        if(rowCnt!=FAIL) {
+            return "registerInfo";
+        }
+
+        return "registerForm";
     }
 
 //    private boolean isValid(User user) {
