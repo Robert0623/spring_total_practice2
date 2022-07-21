@@ -2,6 +2,7 @@ package com.myportfolio.web.controller;
 
 import com.myportfolio.web.dao.UserDao;
 import com.myportfolio.web.domain.User;
+import com.myportfolio.web.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -34,7 +35,7 @@ import java.util.Date;
 @RequestMapping("/register")
 public class RegisterController {
     @Autowired
-    UserDao userDao;
+    UserService userService;
 
     final int FAIL = 0;
 
@@ -71,7 +72,7 @@ public class RegisterController {
 //            m.addAttribute("msg", msg);
 //            return "redirect:/register/add";
 //        }
-        int rowCnt = userDao.insertUser(user);
+        int rowCnt = userService.write(user);
 
         if(rowCnt!=FAIL) {
             return "registerInfo";

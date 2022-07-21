@@ -1,6 +1,6 @@
 # 스프링 복습을 하면서 주석을 만들고, 주석만 보고 게시판을 만들 수 있도록 훈련
 
-## 07.19
+## 07.19, 07.20, 07.21
 ### 초기세팅
 - 설정파일 - pom.xml, root-context.xml, servlet-context.xml 설정
 - index.jsp, menu.css 추가 및 view-controller로 등록
@@ -17,13 +17,16 @@
 
 ### 회원
 //[User.java]
-//1. DB를 보고 private으로 iv를 작성.
+//1. DB를 보고 private으로 iv를 전부 작성.
 //2. birth나 reg_date같이 날짜로 받는 것은 Date타입으로.
 //3. 기본생성자, 생성자, getter&setter, equals&hashCode, toString을 만든다.
 (equals에 reg_date를 빼고, id만 not null 체크)
 
 //[UserDao.java]
-//1차로 JDBC로 작성
+//userMapper.xml을 보고 작성. 인터페이스 추출.
+
+//[UserService.java]
+//UserDao를 보고 작성. 인터페이스 추출.
 
 ### 회원가입 및 회원정보 출력
 //[RegisterController.java]
@@ -37,9 +40,9 @@
 //5. 컨트롤러에서 isValid메서드를 사용한 유효성체크 대신,
 //	 UserValidator 클래스를 작성해서 자동으로 등록한다.(@Initbinder, @Valid) (수동 등록도 가능)
 //6. error가 있으면 registerForm으로 가게 한다.
-//---아래는 MyBatis로 수정 예정---
-//7. JDBC의 경우 UserDao를 주입받고 
-//8. 검증을 통과하면 insert. insert가 성공하면 회원정보가 보이게 하고, 통과하지 못하면 다시 회원가입으로 가게 한다.
+//----아래는 MyBatis로 수정----
+//7. UserService를 주입받고 
+//8. 검증을 통과하면 UserService의 wrtie를 사용해서, 성공하면 회원정보가 보이게 하고, 통과하지 못하면 다시 회원가입으로 가게 한다.
 
 //[registerForm.jsp]
 //form태그에 action, method를 작성하고, onsubmit에 Js로 유효성 검사를 한다.
@@ -66,7 +69,7 @@
 //[LoginController.java]
 //1. GET으로 loginForm으로 이동하는 메서드 작성
 //2. POST로 작성
-//  1. id와 pwd를 loginCheck메서드로 확인.
+//  1. id와 pwd를 loginCheck로 유효성 검사.
 //  2-1. id와 pwd가 일치하지 않으면 loginForm으로 리다이렉트하고 에러메세지를 출력.
 //  2-2. 일치하면 session에 id를 저장하고, rememberId를 확인.
 //     	 rememberId가 true면 쿠키를 생성하고 홈으로 이동
@@ -75,6 +78,8 @@
 //3. GET으로 로그아웃을 하는 메서드 작성
 //	3-1 세션을 종료하고
 //	3-2 홈으로 이동
+//----아래는 MyBatis로 수정----
+//4. UserService를 주입받고, UserService의 read로 loginCheck에서 유효성 검사.
 
 //[loginForm.jsp]
 //rememberId에 체크하고 로그인에 성공했을 때 아이디가 나오고 아이디기억이 체크되어있도록 한다
@@ -83,6 +88,7 @@
 
 ### 게시판
 //[BoardController.java]
+[첫번째]
 //1. GET으로 boardList를 보여주는 메서드 작성
 //2. 로그인체크로 확인.
 //  2-1. 로그인을 안했으면 toURL로 URL값을 가지고 로그인 화면으로 이동
@@ -90,9 +96,74 @@
 //3. 로그인체크는
 //  3-1. 세션을 얻어서
 //  3-2. 세션에 id가 있는지 확인. 있으면 true 없으면 false를 반환.
+[두번째 - 페이징]
+//page와 pageSize를 매개변수로 받는다.
+//기본값을 page=1, pageSize=10을 준다.
+//Map에 offset, pageSize를 저장해서 getPage를 호출 후 Model에 저장.
+//PageHandler객체를 만들어서 Model에 저장.
+
 
 //[boardList.jsp]
+[첫번째]
 //세션을 얻도록 하고,
 //sessionScope로 id를 얻어서 loginId에 저장한다.
 //loginId가 없으면 로그인으로 링크를, 있으면 로그아웃으로 링크를 걸고
 //loginId가 없으면 Login이 보이게, 있으면 ID=아이디가 보이게 한다. 
+[두번째]
+//1. 목록
+//HTML table을 만든다. 열의 이름은 번호, 제목, 이름, 등록일, 조회수로 한다.
+//반복문으로 Model로 받은 리스트를 table에 출력한다.
+//2. 페이징
+//table 밑에 작성한다.
+//반복문으로 a태그를 사용해서 페이지를 표시하고, 조건문으로 <와 >를 표시한다.
+
+### DB 테이블
+[board]
+- bno - int, Not null, Auto inc, Primary key
+- title - varchar(100), Not null
+- content - text, Not null
+- writer - varchar(30), Not null
+- view_cnt - int, default 0
+- comment_cnt - int, default 0
+- reg_date - datetime, default now()
+- up_date - datetime, default now()
+
+### Mapper
+[boardMapper.xml]
+- sql문을 id="selectFromBoard"로 작성하고, include 하도록 한다.
+- insert - 매개변수타입 BoardDto로 title, content, writer를 받는다.
+- select - 매개변수타입 Integer로 bno를 받는다. reg_date, bno로 정렬한다.
+- update - 매개변수타입 BoardDto로 title, content, up_date, WHERE절로 bno, writer를 받는다. 
+- delete - 매개변수타입 Map으로 bno, writer를 받는다.
+- count - resultType을 int로 한다.
+- selectAll - 매개변수타입이 없고, resultType을 BoardDto로 한다. reg_date, bno로 정렬한다.
+- deleteAll - 매개변수타입이 없다.
+- increaseViewCnt - 매개변수타입 Integer로 bno를 받는다.
+- selectPage - 매개변수타입 Map으로 offset, pageSize를 받고 resultType은 BoardDto로 한다. reg_date, bno로 정렬한다.
+
+[userMapper.xml]
+- insert - 매개변수타입 User로 reg_date를 제외한 나머지를 받는다. reg_date는 now()로 입력한다.
+- select - 매개변수타입 String으로 id를 받는다.
+- update - 매개변수타입 User로 reg_date를 제외한 나머지를 받는다. reg_date는 now()로 입력한다.
+- delete - 매개변수타입 String으로 id를 받는다.
+- count - resultType을 int로 한다. 
+- deleteAll - 매개변수타입이 없다.
+
+### Domain
+[BoardDto.java]
+- up_date를 제외하고 DB테이블을 보고 작성한다.
+- 접근제어자는 private
+- 생성자는 title, content, writer만 추가하고, 기본생성자를 만든다.
+- getter&sertter, toString은 전체를 추가하고,
+- equals&hashCode는 bno, title, content, writer만 추가한다.
+
+### Paging
+[PageHandler.java]
+- iv 
+1. totalCnt, pageSize
+2. totalPage, naviSize, page, beginPage, endPage, showPrev, showNext 
+- naviSize의 기본값을 10으로 하고, 생성자 2개를 만든다.
+- 생성자는 totalCnt, page, pageSize를 매개변수로 하고, naviSize를 제외한 나머지는 계산한다.
+- 추가로 생성자를 추가하는데 pageSize는 10으로 하고 위의 생성자를 사용한다.
+- print()메서드, toString, getter&setter를 추가한다.
+- 테스트는 페이지 네비바의 양끝을 중점으로 확인한다.

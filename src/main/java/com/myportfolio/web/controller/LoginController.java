@@ -1,5 +1,9 @@
 package com.myportfolio.web.controller;
 
+import com.myportfolio.web.dao.UserDao;
+import com.myportfolio.web.domain.User;
+import com.myportfolio.web.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +31,9 @@ import java.net.URLEncoder;
 @Controller
 @RequestMapping("/login")
 public class LoginController {
+    @Autowired
+    UserService userService;
+
     @GetMapping("/login")
     public String loginForm() {
         return "loginForm";
@@ -63,6 +70,14 @@ public class LoginController {
     }
 
     private boolean loginCheck(String id, String pwd) {
-        return "asdf".equals(id) && "1234".equals(pwd);
+        User user = null;
+        try {
+            user = userService.read(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return user != null && user.getPwd().equals(pwd);
+//        return "asdf".equals(id) && "1234".equals(pwd);
     }
 }
