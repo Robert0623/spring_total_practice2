@@ -111,6 +111,11 @@
 //remove메서드에서 먼저 세션으로 writer를 구하고, page, pageSize를 RedirectAttributes에 저장한다.
 //그리고 boardService의 remove를 호출하고, 실패하면 예외를 발생시켜서 DEL_ERR라는 msg를 boardList.jsp로 보내고, 
 //성공하면 DEL_OK라는 msg를 boardList.jsp로 보낸다. 
+[네번째 - 쓰기, 수정]
+//GET으로 mode=new를 Model에 저장해서 board.jsp로 보내는 write메서드를 작성.
+//POST로 writer를 boardDto에 저장해서 boardService.write를 호출하는 write메서드 작성. 성공, 실패 메세지를 보낸다.
+//POST로 wirter를 boardDto에 저장해서 boardService.modify를 호출하는 modify메서드 작성. 성공, 실패 메세지를 보낸다.
+
 
 //[boardList.jsp]
 [첫번째]
@@ -127,14 +132,27 @@
 //반복문으로 a태그를 사용해서 페이지를 표시하고, 조건문으로 <, >를 표시한다.
 [세번째] - 읽기, 삭제 관련
 //table의 title에 링크를 건다. bno, page, pageSize를 추가한다.
-//script에 Controller에서 받은 삭제 msg를 확인해서 메세지를 출력한다.
+//script에 Controller에서 받은 삭제 성공, 실패 msg를 확인해서 메세지를 출력한다.
+[네번째] - 쓰기, 수정 관련
+//button으로 id="writeBtn"인 글쓰기 버튼을 만든다.
+//script에 Controller에서 받은 쓰기 성공 msg를 확인해서 메세지를 출력한다.
+
 
 //[board.jsp]
+[첫번째] - 읽기 삭제 관련
 //boardList.jsp를 복사해서 만들고, table을 삭제하고 vs code로 html을 작성.
 //form태그안에 input태그(bno, title), textarea태그(content), button태그(등록, 수정, 삭제, 목록)을 만든다.
 //input태그와 textarea태그를 Controller의 read메서드에서 받은 boardDto로 채운다. 
 //script로 jQuery를 사용해서 listBtn에 이벤트를 걸어준다.
 //removeBtn에도 이벤트를 걸어준다.
+[두번째] - 쓰기, 수정 관련
+//Controller에서 mode=new를 받으면 게시물 읽기를 게시물 글쓰기로 바꾸고, title과 content의 readonly를 없앤다.
+//writeBtn에 post로 이벤트를 걸어준다.
+//  script에 Controller에서 받은 쓰기 실패 msg를 확인해서 메세지를 출력한다.
+//modifyBtn에 post로 이벤트를 걸어준다.
+//  1. 읽기 상태이면 수정 상태로 변경
+//  2. 수정 상태이면, 수정된 내용을 서버로 전송
+
 ### DB 테이블
 [user_info] - utf8/utf9_general_ci
 - id - varchar(30), Not null, Primary key
@@ -194,3 +212,4 @@
 - 추가로 생성자를 추가하는데 pageSize는 10으로 하고 위의 생성자를 사용한다.
 - print()메서드, toString, getter&setter를 추가한다.
 - 테스트는 페이지 네비바의 양끝을 중점으로 확인한다.
+ 
