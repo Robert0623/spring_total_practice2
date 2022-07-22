@@ -29,20 +29,24 @@
 //UserDao를 보고 작성. 인터페이스 추출.
 
 ### 회원가입 및 회원정보 출력
-//[RegisterController.java]
+[RegisterController.java]
 //1. GET, POST를 처리할 메서드를 각각 만든다.
+[Controller내에서 유효성 검사(데이터 검증)하는 방법]
 //2. POST를 처리할 메서드는 User를 받아서 유효성 검사를 한다.
 //  	이 때 메세지를 보내는데 URLEncoder를 사용한다.
 //  	유효성검사를 통과하지 못하면 회원가입화면으로 다시 가게 하고,
 //  	유효성검사를 통과하면 회원정보를 보여주도록 한다.
+[UserValidator로 유효성 검사(데이터 검증)하는 방법]
+//2. 컨트롤러내에서 isValid메서드를 사용한 유효성체크 대신,
+//	 UserValidator 클래스를 작성해서 자동으로 등록한다.(@InitBinder, @Valid) (수동 등록도 가능)
+[타입 변환]
 //3. 검증할 객체의 바로뒤에 BindingResult를 붙인다.
 //4. @InitBinder를 붙여서 WebDataBinder를 매개변수로 갖는 메서드를 만들어서 타입변환을 위해 CustomEditor를 등록한다.
-//5. 컨트롤러에서 isValid메서드를 사용한 유효성체크 대신,
-//	 UserValidator 클래스를 작성해서 자동으로 등록한다.(@Initbinder, @Valid) (수동 등록도 가능)
-//6. error가 있으면 registerForm으로 가게 한다.
+
+//5. error가 있으면 registerForm으로 가게 한다.
 //----아래는 MyBatis로 수정----
-//7. UserService를 주입받고 
-//8. 검증을 통과하면 UserService의 wrtie를 사용해서, 성공하면 회원정보가 보이게 하고, 통과하지 못하면 다시 회원가입으로 가게 한다.
+//6. UserService를 주입받고 
+//7. 검증을 통과하면 UserService의 wrtie를 사용해서, 성공하면 회원정보가 보이게 하고, 통과하지 못하면 다시 회원가입으로 가게 한다.
 
 //[registerForm.jsp]
 //form태그에 action, method를 작성하고, onsubmit에 Js로 유효성 검사를 한다.
@@ -101,7 +105,12 @@
 //기본값을 page=1, pageSize=10을 준다.
 //Map에 offset, pageSize를 저장해서 getPage를 호출 후 Model에 저장.
 //PageHandler객체를 만들어서 Model에 저장.
-
+[세번째 - 읽기, 삭제]
+//list메서드에서 page, pageSize를 boardList.jsp에서 받아서 Model에 저장한다.
+//read메서드에서 boardService의 read를 호출한 값과 page, pageSize를 Model에 저장하고 board.jsp로 보낸다.
+//remove메서드에서 먼저 세션으로 writer를 구하고, page, pageSize를 RedirectAttributes에 저장한다.
+//그리고 boardService의 remove를 호출하고, 실패하면 예외를 발생시켜서 DEL_ERR라는 msg를 boardList.jsp로 보내고, 
+//성공하면 DEL_OK라는 msg를 boardList.jsp로 보낸다. 
 
 //[boardList.jsp]
 [첫번째]
@@ -115,9 +124,27 @@
 //반복문으로 Model로 받은 리스트를 table에 출력한다.
 //2. 페이징
 //table 밑에 작성한다.
-//반복문으로 a태그를 사용해서 페이지를 표시하고, 조건문으로 <와 >를 표시한다.
+//반복문으로 a태그를 사용해서 페이지를 표시하고, 조건문으로 <, >를 표시한다.
+[세번째] - 읽기, 삭제 관련
+//table의 title에 링크를 건다. bno, page, pageSize를 추가한다.
+//script에 Controller에서 받은 삭제 msg를 확인해서 메세지를 출력한다.
 
+//[board.jsp]
+//boardList.jsp를 복사해서 만들고, table을 삭제하고 vs code로 html을 작성.
+//form태그안에 input태그(bno, title), textarea태그(content), button태그(등록, 수정, 삭제, 목록)을 만든다.
+//input태그와 textarea태그를 Controller의 read메서드에서 받은 boardDto로 채운다. 
+//script로 jQuery를 사용해서 listBtn에 이벤트를 걸어준다.
+//removeBtn에도 이벤트를 걸어준다.
 ### DB 테이블
+[user_info] - utf8/utf9_general_ci
+- id - varchar(30), Not null, Primary key
+- pwd - varchar(50)
+- name - varchar(30)
+- email - varchar(30)
+- birth - date
+- sns - varchar(30)
+- reg_date - datetime
+
 [board]
 - bno - int, Not null, Auto inc, Primary key
 - title - varchar(100), Not null
