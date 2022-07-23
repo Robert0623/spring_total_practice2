@@ -1,33 +1,39 @@
 package com.myportfolio.web.domain;
 
 public class PageHandler {
+//    private int page;
+//    private int pageSize;
+//    private String option;
+//    private String keyword;
+    private SearchCondition sc;
+
     private int totalCnt;
-    private int pageSize;
     private int totalPage;
     private int naviSize = 10;
-    private int page;
     private int beginPage;
     private int endPage;
     private boolean showPrev;
     private boolean showNext;
 
-    public PageHandler(int totalCnt, int page) {
-        this(totalCnt, page, 10);
+    public PageHandler(int totalCnt, SearchCondition sc) {
+        this.totalPage = totalCnt;
+        this.sc = sc;
+
+        doPaging(totalCnt, sc);
     }
 
-    public PageHandler(int totalCnt, int page, int pageSize) {
-        this.totalPage = totalCnt;
-        this.page = page;
-        this.pageSize = pageSize;
 
-        totalPage = (int) Math.ceil(totalCnt/(double)pageSize);
-        beginPage = (page-1)/naviSize*naviSize+1;
+    public void doPaging(int totalCnt, SearchCondition sc) {
+        this.totalPage = totalCnt;
+
+        totalPage = (int) Math.ceil(totalCnt/(double)sc.getPageSize());
+        beginPage = (sc.getPage()-1)/naviSize*naviSize+1;
         endPage = Math.min(beginPage+naviSize-1, totalPage);
         showPrev = beginPage!=1;
         showNext = endPage!=totalPage;
     }
     void print() {
-        System.out.println("page = " + page);
+        System.out.println("page = " + sc.getPage());
         System.out.print(showPrev ? "[PREV] " : "");
         for (int i = beginPage; i <= endPage; i++) {
             System.out.print(i + " ");
@@ -38,16 +44,23 @@ public class PageHandler {
     @Override
     public String toString() {
         return "PageHandler{" +
-                "totalCnt=" + totalCnt +
-                ", pageSize=" + pageSize +
+                "sc=" + sc +
+                ", totalCnt=" + totalCnt +
                 ", totalPage=" + totalPage +
                 ", naviSize=" + naviSize +
-                ", page=" + page +
                 ", beginPage=" + beginPage +
                 ", endPage=" + endPage +
                 ", showPrev=" + showPrev +
                 ", showNext=" + showNext +
                 '}';
+    }
+
+    public SearchCondition getSc() {
+        return sc;
+    }
+
+    public void setSc(SearchCondition sc) {
+        this.sc = sc;
     }
 
     public int getTotalCnt() {
@@ -56,14 +69,6 @@ public class PageHandler {
 
     public void setTotalCnt(int totalCnt) {
         this.totalCnt = totalCnt;
-    }
-
-    public int getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
     }
 
     public int getTotalPage() {
@@ -80,14 +85,6 @@ public class PageHandler {
 
     public void setNaviSize(int naviSize) {
         this.naviSize = naviSize;
-    }
-
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
     }
 
     public int getBeginPage() {

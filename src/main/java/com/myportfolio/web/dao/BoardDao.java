@@ -1,6 +1,7 @@
 package com.myportfolio.web.dao;
 
 import com.myportfolio.web.domain.BoardDto;
+import com.myportfolio.web.domain.SearchCondition;
 
 import java.util.List;
 import java.util.Map;
@@ -23,4 +24,8 @@ public interface BoardDao {
     List<BoardDto> selectPage(Map map) throws Exception;
 
     int deleteAll() throws Exception;
+
+    List<BoardDto> searchSelectPage(SearchCondition sc) throws Exception;
+
+    int searchResultCnt(SearchCondition sc) throws Exception;
 }

@@ -118,6 +118,12 @@
 //  그리고 첫번쨰 페이지로 이동.
 //POST로 wirter를 boardDto에 저장해서 boardService.modify를 호출하는 modify메서드 작성. 성공, 실패 메세지를 보낸다.
 //  그리고 수정한 게시물이 있는 페이지로 이동.
+[다섯번째 - SearchCondition으로 page, pageSize를 받도록]
+- 매개변수 page, pageSize를 SearchCondition sc로 변경.
+- page, pageSize 기본값을 SearchCondition에서 처리하도록 제거.
+- totalCnt를 sc를 받도록 변경하고, Model에 저장.
+- PageHandler 객체가 totalCnt, sc를 받도록 변경.
+- list를 sc를 받도록 변경.
 
 //[boardList.jsp]
 [첫번째]
@@ -140,7 +146,10 @@
 //  글쓰기 버튼을 클릭하면 게시물 글쓰기로 가도록 만든다.
 //script에 Controller에서 받은 쓰기 성공 msg를 확인해서 메세지를 출력한다.
 //script에 Controller에서 받은 수정 성공 msg를 확인해서 메세지를 출력한다.
-
+[다섯번째] - HTML, CSS, SCRIPT 수정
+- 스크립트에 성공, 실패 msg 추가
+- 검색 옵션 추가
+- 페이지가 필요한 곳에 ph.sc.getQueryString을 사용해서 쿼리스트링을 붙인다.
 
 //[board.jsp]
 [첫번째] - 읽기 삭제 관련
@@ -157,6 +166,13 @@
 //  1. 읽기 상태이면 수정 상태로 변경
 //  2. 수정 상태이면, 수정된 내용을 서버로 전송
 //  script에 Controller에서 받은 수정 실패 msg를 확인해서 메세지를 출력한다.
+[세번째] - HTML, CSS, script 변경
+- EL로 mode eq new이면 등록버튼이 나오게, mode ne new이면 글쓰기 버튼이 나오게 한다.
+- EL로 writer eq loginId면 수정, 삭제버튼이 나오게 한다.
+- script에서 POST 글쓰기, 수정할 때 submit전에 formCheck를 하도록 수정.
+- formCheck는 title, content가 비어있으면 false, 아니면 true를 반환.
+- 페이지 정보를 보내야 하는 수정, 삭제, 목록 버튼에 searchCondition.queryString을 붙인다.
+- 값을 입력하는 곳은 c:out태그로 수정한다.
 
 ### DB 테이블
 [user_info] - utf8/utf9_general_ci
@@ -180,6 +196,7 @@
 
 ### Mapper
 [boardMapper.xml]
+[첫번째]
 - sql문을 id="selectFromBoard"로 작성하고, include 하도록 한다.
 - insert - 매개변수타입 BoardDto로 title, content, writer를 받는다.
 - select - 매개변수타입 Integer로 bno를 받는다. reg_date, bno로 정렬한다.
@@ -190,6 +207,10 @@
 - deleteAll - 매개변수타입이 없다.
 - increaseViewCnt - 매개변수타입 Integer로 bno를 받는다.
 - selectPage - 매개변수타입 Map으로 offset, pageSize를 받고 resultType은 BoardDto로 한다. reg_date, bno로 정렬한다.
+[두번째] - 검색기능 추가
+- sql태그로 searchCondition - option, keyword로 동적 쿼리를 만든다.
+- searchSelectPage
+- searchResultCnt
 
 [userMapper.xml]
 - insert - 매개변수타입 User로 reg_date를 제외한 나머지를 받는다. reg_date는 now()로 입력한다.
@@ -207,8 +228,8 @@
 - getter&sertter, toString은 전체를 추가하고,
 - equals&hashCode는 bno, title, content, writer만 추가한다.
 
-### Paging
-[PageHandler.java]
+[PageHandler.java] - 페이징
+[첫번째]
 - iv 
 1. totalCnt, pageSize
 2. totalPage, naviSize, page, beginPage, endPage, showPrev, showNext 
@@ -217,4 +238,25 @@
 - 추가로 생성자를 추가하는데 pageSize는 10으로 하고 위의 생성자를 사용한다.
 - print()메서드, toString, getter&setter를 추가한다.
 - 테스트는 페이지 네비바의 양끝을 중점으로 확인한다.
+[두번째] - 검색 기능 추가
+- page, pageSize, (option, keyword)를 SearchCondition으로 받는다.
+- 생성자 새로 추가(totalCnt, SearchCondition sc를 받아서 doPaging을 호출)
+- doPaging(기존 PageHandler 생성자를 변경)을 totalCnt, SearchCondition sc를 받도록 하고, 
+doPaging과 print의 page, pageSize를 sc에서 받도록 한다.
+- toString을 새로 만들고 SearchCondition sc의 getter & setter를 추가한다.
+
+[SearchCondition] - 검색 조건
+[첫번째]
+- iv인 page, pageSize, offset, keyword, option에 기본값을 준다.
+- offset제외하고 생성자, 기본생성자 추가
+- getter & setter, toString 추가. 
+[두번째]
+- offset iv를 제거한다.
+- offset의 getter만 놔두고 setter는 제거한다(수정하지 못하도록 하기 위해). 
+- offset의 getter는 page와 pageSize로만 계산하도록 수정한다.
+- toString의 offset은 getter로 수정한다.
+- getQueryString메서드를 추가한다.(page, pageSize, option, keyword를 쿼리스트링으로 붙이는 메서드)
+UriComponentsBuilder, queryParam, build, toString을 사용해서 작성한다. 
+page를 받을 때와 받지 않을 때 두 가지를 작성한다.
+
  
