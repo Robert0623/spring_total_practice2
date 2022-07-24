@@ -107,7 +107,7 @@
 //Map에 offset, pageSize를 저장해서 getPage를 호출 후 Model에 저장.
 //PageHandler객체를 만들어서 Model에 저장.
 [세번째 - 읽기, 삭제]
-//list메서드에서 page, pageSize를 boardList.jsp에서 받아서 Model에 저장한다.
+//list메서드에서 bno, page, pageSize를 boardList.jsp에서 받아서 Model에 저장한다.
 //read메서드에서 boardService의 read를 호출한 값과 page, pageSize를 Model에 저장하고 board.jsp로 보낸다.
 //remove메서드에서 먼저 세션으로 writer를 구하고, page, pageSize를 RedirectAttributes에 저장한다.
 //그리고 boardService의 remove를 호출하고, 실패하면 예외를 발생시켜서 DEL_ERR라는 msg를 boardList.jsp로 보내고, 
@@ -122,8 +122,8 @@
 - 매개변수 page, pageSize를 SearchCondition sc로 변경.
 - page, pageSize 기본값을 SearchCondition에서 처리하도록 제거.
 - totalCnt를 sc를 받도록 변경하고, Model에 저장.
-- PageHandler 객체가 totalCnt, sc를 받도록 변경.
-- list를 sc를 받도록 변경.
+- PageHandler 객체가 totalCnt, sc를 받도록 변경하고 Model에 저장.
+- list를 sc를 받도록 변경하고 Model에 저장.
 
 //[boardList.jsp]
 [첫번째]
@@ -150,6 +150,7 @@
 - 스크립트에 성공, 실패 msg 추가
 - 검색 옵션 추가
 - 페이지가 필요한 곳에 ph.sc.getQueryString을 사용해서 쿼리스트링을 붙인다.
+- c:out태그를 사용한다.
 
 //[board.jsp]
 [첫번째] - 읽기 삭제 관련
@@ -175,7 +176,7 @@
 - 값을 입력하는 곳은 c:out태그로 수정한다.
 
 ### DB 테이블
-[user_info] - utf8/utf9_general_ci
+[user_info] - utf8/utf8_general_ci
 - id - varchar(30), Not null, Primary key
 - pwd - varchar(50)
 - name - varchar(30)
@@ -184,13 +185,22 @@
 - sns - varchar(30)
 - reg_date - datetime
 
-[board]
+[board] - utf8/utf8_general_ci
 - bno - int, Not null, Auto inc, Primary key
 - title - varchar(100), Not null
 - content - text, Not null
 - writer - varchar(30), Not null
 - view_cnt - int, default 0
 - comment_cnt - int, default 0
+- reg_date - datetime, default now()
+- up_date - datetime, default now()
+
+[comment] - utf8/utf8_general_ci
+- cno - int, Not null, Auto inc, Primary key
+- bno - int, Not null
+- pcno - int
+- comment - varchar(3000)
+- commenter - varchar(30)
 - reg_date - datetime, default now()
 - up_date - datetime, default now()
 
@@ -209,8 +219,10 @@
 - selectPage - 매개변수타입 Map으로 offset, pageSize를 받고 resultType은 BoardDto로 한다. reg_date, bno로 정렬한다.
 [두번째] - 검색기능 추가
 - sql태그로 searchCondition - option, keyword로 동적 쿼리를 만든다.
-- searchSelectPage
-- searchResultCnt
+- searchSelectPage 추가
+- searchResultCnt 추가
+[세번째] - 댓글기능 추가
+- updateCommentCnt 추가
 
 [userMapper.xml]
 - insert - 매개변수타입 User로 reg_date를 제외한 나머지를 받는다. reg_date는 now()로 입력한다.
@@ -220,13 +232,29 @@
 - count - resultType을 int로 한다. 
 - deleteAll - 매개변수타입이 없다.
 
+[commentMapper.xml]
+- count - 해당 bno의 댓글 개수를 반환
+- insert - CommentDto에 cno를 제외한 나머지 값을 insert한다.
+- select - 해당 cno의 CommentDto의 모든 값을 반환한다. 
+- update - CommentDto로 comment를 받고 up_date를 수정하고, WHERE절은 cno와 commenter로 한다.
+- delete - map으로 cno와 commenter를 받는다.
+- selectAll - int로 bno를 받아서 CommentDto의 모든 값을 반환하고, reg_date와 cno를 오름차순으로 정렬.
+- deleteAll - int로 bno를 받는다.
+
 ### Domain
 [BoardDto.java]
-- up_date를 제외하고 DB테이블을 보고 작성한다.
+- up_date를 제외하고 DB테이블을 보고 iv를 작성한다.
 - 접근제어자는 private
 - 생성자는 title, content, writer만 추가하고, 기본생성자를 만든다.
 - getter&sertter, toString은 전체를 추가하고,
 - equals&hashCode는 bno, title, content, writer만 추가한다.
+
+[CommentDto.java]
+- DB테이블을 보고 iv 작성한다.
+- 접근 제어자는 private
+- 생성자는 bno, pcno, comment, commenter만 추가하고, 기본생성자를 만든다.
+- getter&setter, toString은 전체를 추가하고,
+- equals&hashCode는 reg_date, up_date를 제외하고 나머지 전부 추가한다.
 
 [PageHandler.java] - 페이징
 [첫번째]
@@ -258,5 +286,15 @@ doPaging과 print의 page, pageSize를 sc에서 받도록 한다.
 - getQueryString메서드를 추가한다.(page, pageSize, option, keyword를 쿼리스트링으로 붙이는 메서드)
 UriComponentsBuilder, queryParam, build, toString을 사용해서 작성한다. 
 page를 받을 때와 받지 않을 때 두 가지를 작성한다.
+
+[BoardDao.java] 
+- updateCommentCnt 추가
+
+[CommentDao.java]
+- mapper를 보고 작성.
+
+[CommentService.java]
+- CommentDao와 BoardDao를 둘 다 주입받는다.
+- write와 delete에 updateCommentCnt를 위해 Tx를 걸어준다.
 
  
