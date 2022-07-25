@@ -29,10 +29,10 @@
         WHERE cno = #{cno} and commenter = #{commenter}
     </delete>
     <select id="selectAll" parameterType="int" resultType="CommentDto">
-        SELECT *
+        SELECT cno, bno, ifnull(pcno, cno) as pcno, comment, commenter, reg_date, up_date
         FROM comment
         WHERE bno = #{bno}
-        ORDER BY reg_date ASC, cno ASC
+        ORDER BY pcno ASC, cno ASC;
     </select>
     <delete id="deleteAll" parameterType="int">
         DELETE FROM comment
