@@ -297,4 +297,39 @@ page를 받을 때와 받지 않을 때 두 가지를 작성한다.
 - CommentDao와 BoardDao를 둘 다 주입받는다.
 - write와 delete에 updateCommentCnt를 위해 Tx를 걸어준다.
 
+[CommentController.java]
+- 클래스앞에 @RestController를 붙이거나 아니면 해당 메서드앞에 @ResponseBody를 붙인다.
+- Service를 주입받고, 각 메서드는 반환타입을 ResponseEntity로 한다.
+- list는 @GetMapping으로 bno를 쿼리스트링으로 받고, service의 getList를 호출한다. 
+list와 상태코드를 반환한다.
+- remove는 @DeleteMapping으로 cno을 URL로, bno를 쿼리스트링, session을 매개변수로 받고, service의 remove를 호출한다. 
+성공, 실패 메세지와 상태코드를 반환한다.
+- write는 @PostMapping으로 dto를 @RequestBody로, bno를 쿼리스트링, session을 매개변수로 받고,
+작성자와 bno를 dto에 저장하고, service의 write를 호출한다. 성공, 실패 메세지와 상태코드를 반환한다.
+- modify는 cno를 URL로, dto를 @RequestBody로, session을 매개변수로 받고,
+작성자와 cno를 dto에 저장해서 service의 modify를 호출한다.
+성공, 실패 메세지와 상태코드를 반환한다.
+
+[test.jsp]
+- 댓글 리스트를 담을 div태그를 id=commentList로 만든다.
+- 댓글을 등록, 수정할 input태그를 name=comment로 만든다.
+- 등록할 버튼을 id=sendBtn으로, 수정할 버튼을 id=modBtn으로 만든다.
+- [script태그]
+1. 등록된 댓글 전체를 보여주는 showList함수를 만든다.
+$.ajax에 type, url, 콜백함수를 작성한다.
+2. 리스트로 되어있는 댓글을 ul, li태그를 사용한 문자열로 변경하는 함수 toHtml을 작성한다.
+toHtml은 반복문을 사용해서 내용을 채우고, cno, pcno, bno는 key=value에서 key에 'date-'를 앞에 붙인다.
+commenter와 comment는 구분을 위해 span태그를 붙인다.
+삭제버튼을 class="delBtn"으로, 수정버튼을 class="ModBtn"으로 만든다.
+3. 댓글 옆의 삭제 기능을 구현한다.
+부모인 id="commentList"에 이벤트를 걸어서, 삭제버튼을 클릭하면 함수가 실행되게 한다.
+cno, bno를 부모태그에서 받아서 $.ajax를 작성한다.
+4. 댓글 등록 기능을 구현한다.
+name=comment인 input태그를 값을 변수 comment에 저장하고,
+빈문자열에 대한 유효성검사를 한다.
+통과하면 $.ajax를 작성하는데, JSON문자열로 bno, comment를 서버로 전송한다.
+5. 댓글 옆의 수정 기능을 구현한다.
+1) 클릭하면 해당 댓글의 부모 태그에 cno, comment를 변수 cno, comment에 저장하고, comment의 내용을 input에 뿌려준다.
+2) cno를 id="modBtn"에 전달한다.
+6. input태그의 수정버튼을 클릭하면 공백 유효성 검사 후, cno, comment를 JSON문자열로 서버에 전송한다.
  
