@@ -240,6 +240,7 @@
 - delete - map으로 cno와 commenter를 받는다.
 - selectAll - int로 bno를 받아서 CommentDto의 모든 값을 반환하고, reg_date와 cno를 오름차순으로 정렬.
 - deleteAll - int로 bno를 받는다.
+- 대댓글을 위해 selectAll을 수정. pcno가 null이면 cno를 쓰도록 하고, pcno로 오름차순, cno로 오름차순 정렬한다.
 
 ### Domain
 [BoardDto.java]
@@ -329,7 +330,15 @@ name=comment인 input태그를 값을 변수 comment에 저장하고,
 빈문자열에 대한 유효성검사를 한다.
 통과하면 $.ajax를 작성하는데, JSON문자열로 bno, comment를 서버로 전송한다.
 5. 댓글 옆의 수정 기능을 구현한다.
-1) 클릭하면 해당 댓글의 부모 태그에 cno, comment를 변수 cno, comment에 저장하고, comment의 내용을 input에 뿌려준다.
-2) cno를 id="modBtn"에 전달한다.
+5-1. 클릭하면 해당 댓글의 부모 태그에 cno, comment를 변수 cno, comment에 저장하고, comment의 내용을 input에 뿌려준다. 
+5-2. cno를 id="modBtn"에 전달한다.
 6. input태그의 수정버튼을 클릭하면 공백 유효성 검사 후, cno, comment를 JSON문자열로 서버에 전송한다.
+- [대댓글]
+1. 댓글옆에 답글버튼을 만들고, cno와 pcno가 일치하지않으면 'ㄴ'을 넣도록 한다.
+2. 대댓글을 위해 div태그를 만들고, input태그와 button태그를 넣는다.
+처음에는 보이지 않다가, 답글버튼을 클릭하면 해당 댓글의 바로 밑에 보이도록 한다.
+3. 답글버튼을 누르면 replyForm을 옮기고, 답글을 입력할 폼을 보여주게 한다.
+4. id가 wrtRepBtn인 등록버튼을 클릭하면 공백일 때 유효성 검사를 하고, 
+ajax POST로 pcno, bno, comment를 서버로 보내게 한다.
+전송 후에 다시 보이지 않게 하고 내용을 비운 뒤 원래자리로 가게 한다.
  
