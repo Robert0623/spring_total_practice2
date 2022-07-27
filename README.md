@@ -6,7 +6,7 @@
 - index.jsp, menu.css 추가 및 view-controller로 등록
 - Tomcat 설정 및 실행 확인
 - GitHub 연동 및 .gitignore 추가, README 추가
-
+ 
 ### 홈화면
 //[index.jsp]
 //session을 시작하지 않도록 하고,
