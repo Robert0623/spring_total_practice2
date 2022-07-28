@@ -33,18 +33,15 @@ public class BoardController {
     BoardService boardService;
 
     @PostMapping("/modify")
-    public String modify(BoardDto boardDto, Integer page, Integer pageSize, Model m, HttpSession session, RedirectAttributes rattr) {
+    public String modify(BoardDto boardDto, SearchCondition sc, Model m, HttpSession session, RedirectAttributes rattr) {
         String writer = (String) session.getAttribute("id");
         boardDto.setWriter(writer);
         try {
-            rattr.addAttribute("page", page);
-            rattr.addAttribute("pageSize", pageSize);
-
             int rowCnt = boardService.modify(boardDto);
             if(rowCnt!=1)
                 throw new Exception("Modify Failed");
             rattr.addFlashAttribute("msg", "MOD_OK");
-            return "redirect:/board/list";
+            return "redirect:/board/list"+sc.getQueryString();
         } catch (Exception e) {
             e.printStackTrace();
             m.addAttribute(boardDto);
@@ -66,6 +63,7 @@ public class BoardController {
         } catch (Exception e) {
             e.printStackTrace();
             m.addAttribute(boardDto);
+            m.addAttribute("mode", "new");
             m.addAttribute("msg", "WRT_ERR");
             return "board";
         }
@@ -78,11 +76,9 @@ public class BoardController {
     }
 
     @PostMapping("/remove")
-    public String remove(Integer bno, Integer page, Integer pageSize, Model m, HttpSession session, RedirectAttributes rattr) {
+    public String remove(Integer bno, SearchCondition sc, Model m, HttpSession session, RedirectAttributes rattr) {
         String writer = (String) session.getAttribute("id");
         try {
-            rattr.addAttribute("page", page);
-            rattr.addAttribute("pageSize", pageSize);
             int rowCnt = boardService.remove(bno, writer);
             if(rowCnt!=1)
                 throw new Exception("Remove Failed");
@@ -92,18 +88,18 @@ public class BoardController {
             rattr.addFlashAttribute("msg", "DEL_ERR");
         }
 
-        return "redirect:/board/list";
+        return "redirect:/board/list"+sc.getQueryString();
     }
 
     @GetMapping("/read")
-    public String read(Integer bno, Integer page, Integer pageSize, Model m) {
+    public String read(Integer bno, SearchCondition sc, RedirectAttributes rattr, Model m) {
         try {
             BoardDto boardDto = boardService.read(bno);
             m.addAttribute(boardDto);
-            m.addAttribute("page", page);
-            m.addAttribute("pageSize", pageSize);
         } catch (Exception e) {
             e.printStackTrace();
+            rattr.addFlashAttribute("msg", "READ_ERR");
+            return "redirect:/board/list"+sc.getQueryString();
         }
         return "board";
     }
@@ -126,6 +122,8 @@ public class BoardController {
 
         } catch (Exception e) {
             e.printStackTrace();
+            m.addAttribute("msg", "LIST_ERR");
+            m.addAttribute("totalCnt", 0);
         }
 
         return "boardList";
