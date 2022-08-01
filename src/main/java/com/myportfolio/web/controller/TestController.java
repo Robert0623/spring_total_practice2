@@ -6,6 +6,7 @@ import com.myportfolio.web.domain.SearchCondition;
 import com.myportfolio.web.domain.User;
 import com.myportfolio.web.service.BoardService;
 import com.myportfolio.web.service.UserService;
+import org.apache.ibatis.javassist.Loader;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -31,8 +32,10 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-
+@Controller
 public class TestController {
-
-
+    @GetMapping("/login/login")
+    public String regi() {
+        return "loginForm";
+    }
 }

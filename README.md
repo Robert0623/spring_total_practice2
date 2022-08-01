@@ -342,5 +342,6 @@ name=comment인 input태그를 값을 변수 comment에 저장하고,
 ajax POST로 pcno, bno, comment를 서버로 보내게 한다.
 전송 후에 다시 보이지 않게 하고 내용을 비운 뒤 원래자리로 가게 한다.
 
+## 08.01
 [전체복습]
  
