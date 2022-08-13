@@ -42,9 +42,9 @@
 </div>
 <script>
   $(document).ready(function() {
-    $('#listBtn').on("click", function() {
-      location.href = "<c:url value='/board/list'/>?page=${page}&pageSize=${pageSize}";
-    });
+      $('#listBtn').on("click", function() {
+        location.href = "<c:url value='/board/list'/>?page=${page}&pageSize=${pageSize}";
+      });
     $('#modifyBtn').on("click", function() {
       //1. 읽기 상태이면 수정 상태로 변경
       let form = $('#form');
